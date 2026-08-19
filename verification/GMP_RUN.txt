@@ -1,0 +1,10 @@
+INDEPENDENT C++/GMP TWO-TEMPERATURE RECONSTRUCTION: PASS
+algorithm: Apery shortest paths + support intersections + sparse monomials
+|M|=75 |M+M|=155 |M-M|=161
+rho < log(249293/10000): PASS
+fixed-rate exponent > 1.21418: PASS
+finite-size correction: PASS
+admissibility margin lower > 0.000004277214540438787252509261
+exponent-rate margin lower > 0.000002881889332672970012273825
+finite N_bits=2129 L_bits=2131
+CERTIFIED NUMERICAL HYPOTHESES FOR THE WRITTEN THEOREM: C_3a > 1.21418
