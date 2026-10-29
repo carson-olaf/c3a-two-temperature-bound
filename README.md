@@ -1,6 +1,7 @@
 # C3a two-temperature cyclic-compression certificate
 
-This package contains a candidate proof and two exact arithmetic verifiers for
+This package contains a Lean 4 finite-certificate proof, the original written
+argument, and two exact arithmetic verifiers for
 
 \[
 C_{3a}>1.21418.
@@ -18,8 +19,28 @@ The proof is in `c3a_two_temperature_proof.md` and
 `c3a_two_temperature_proof.pdf`.
 
 Prepared by Carson Olafson, August 19, 2026, with extensive assistance from
-ChatGPT. The package is offered for external mathematical review and is not a
-Lean formalization or a refereed publication.
+ChatGPT. The original written argument remains available for external review.
+The finite bound now has a Lean formalization; this is not a claim of external
+referee acceptance.
+
+## Lean finite certificate
+
+[The formalization](formalization/lean/README.md) proves, with Kleinwaks's
+unchanged definition of the GHR constant:
+
+```lean
+theorem c3a_gt_121418 : (60709 / 50000 : ℝ) < MaskedDigit.C3a
+```
+
+It uses a single finite type at depth `10^13`, with the same alphabet and
+`x`, `y` as above. Bertrand's prime is chosen above `|V-V| + 161`; the
+formalization uses dilation instead of the written proof's rescaling.
+No limit argument is required. The finite checks use `native_decide`;
+the axiom report includes `Lean.ofReduceBool` and `Lean.trustCompiler`.
+
+Logan Kleinwaks's GHR principle, type-counting infrastructure, and analytic
+bounds are reused under Apache-2.0 with attribution in every reused file.
+See the [axiom audit](formalization/lean/evidence/AXIOMS.txt).
 
 The two-temperature theorem builds on an earlier `1.2060` candidate and on
 [Logan Kleinwaks's public review](https://github.com/teorth/optimizationproblems/pull/134#issuecomment-5299513691).

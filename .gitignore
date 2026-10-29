@@ -6,3 +6,6 @@ tmp/
 *.log
 *.out
 *.synctex.gz
+
+# Lean build products
+formalization/lean/.lake/
