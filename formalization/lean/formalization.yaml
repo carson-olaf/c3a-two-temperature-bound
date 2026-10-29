@@ -93,18 +93,17 @@ automation:
         interface. Lean, Lake, Mathlib tactics, exact rational arithmetic,
         and kernel evaluation are used for verification.
     - method: agent
-      models: [Claude (exact model not recorded)]
+      models: [Claude Opus 5.5]
       tool_setup: >-
-        Adversarial referee review of the first version, as reported by the
-        maintainer. This is separate from authorship of the Lean proof and
+        Adversarial referee review of the first version (commit 5bbc2a5,
+        which still used native_decide) on 2026-10-29, including an
+        independent recomputation of its finite certificate data. This is separate from authorship of the Lean proof and
         is not claimed as a review of the final Palomar branch.
   notes: >-
     Carson Olafson is the human author and responsible maintainer. AI systems
     are credited here as tools, not as project authors. ChatGPT also assisted
     the research, written argument, and independent verification programs as
-    disclosed in the root README. TODO: identify the exact Claude model and
-    review date if that historical record can be recovered; neither is known
-    from the supplied evidence. Costs and complete prompt logs are not recorded.
+    disclosed in the root README. Costs and complete prompt logs are not recorded.
 fidelity:
   divergences: >-
     The claim is the strict finite bound, not the general limiting theorem.
@@ -119,9 +118,10 @@ fidelity:
     by this formalization or by a mechanical preflight.
 review:
   status: agent-reviewed
-  reviewers: [Claude (exact model not recorded)]
+  reviewers: [Claude Opus 5.5]
   notes: >-
-    The first version received an adversarial Claude review. The historical
+    The first version received an adversarial Claude Opus 5.5 review on
+    2026-10-29. The historical
     INDEPENDENT_AUDIT_REPORT.md concerns the written argument and arithmetic,
     predates the completed Lean proof, and is not evidence of a final-branch
     Lean or human review. Local build and axiom checks are mechanical checks
