@@ -1,9 +1,13 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 -/
-import C3a.CyclicCompression
-import RequestProject.GHRConstant
+public import C3a.CyclicCompression
+public import RequestProject.GHRConstant
+
+@[expose] public section
 
 /-! # Lifting a finite-field compression to nonnegative integers
 
@@ -54,7 +58,8 @@ theorem exists_integer_compression {ι : Type*} [Fintype ι] [DecidableEq ι]
   obtain ⟨c, h⟩ := exists_large_dot_image (W.image (reduceVec p)) (hne.image _)
     (by simpa [hc, ZMod.card] using hcard)
   refine ⟨quotientMap p c, ?_⟩
-  simpa only [hc, image_image, quotientMap, dotHom, reduceVec] using h
+  rw [hc, image_image] at h
+  exact h
 
 /-- A set in `[0,2p)` has at most twice as many elements as residues. -/
 theorem card_le_two_mul_residue_image (S : Finset ℕ) (p : ℕ) (hp : 0 < p)

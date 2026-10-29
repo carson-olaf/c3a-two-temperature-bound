@@ -1,8 +1,12 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 -/
-import Mathlib
+public import Mathlib
+
+@[expose] public section
 
 /-! # Finite-field compression by averaging collisions
 
@@ -85,10 +89,13 @@ theorem dot_collision_count {ι F : Type*} [Fintype ι] [DecidableEq ι] [Field 
   classical
   have hn : a - b ≠ 0 := sub_ne_zero.mpr hab
   have h := card_fiber_mul (dotHom (a - b)) (dotHom_surjective _ hn) 0
-  convert h using 2
-  congr 1
-  ext c
-  simp [dotHom, mul_sub, sum_sub_distrib, sub_eq_zero]
+  have hf : (univ.filter fun c => dotHom a c = dotHom b c) =
+      (univ.filter fun c => dotHom (a - b) c = 0) := by
+    apply Finset.filter_congr
+    intro c _
+    simp [dotHom, mul_sub, sum_sub_distrib, sub_eq_zero]
+  rw [hf]
+  exact h
 
 /-- There is a linear functional with fewer than twice as many ordered
 collisions as points, if the field is larger than the set. -/

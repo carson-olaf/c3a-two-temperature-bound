@@ -1,10 +1,14 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 Uses the logarithm enclosure lemmas of Logan Kleinwaks, Apache-2.0.
 -/
-import C3a.CertificateData
-import RequestProject.LogBounds
+public import C3a.CertificateData
+public import RequestProject.LogBounds
+
+@[expose] public section
 
 /-! # Rational logarithm bounds for the finite certificate -/
 open scoped BigOperators

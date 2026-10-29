@@ -113,3 +113,9 @@ theorem is expressly invited.
 With Pandoc and Tectonic installed, run `scripts/build-paper.sh`. It rebuilds
 both the TeX source and PDF from the Markdown paper. `PANDOC` and `TECTONIC`
 can specify executable paths. This revision used Pandoc 3.9 and Tectonic 0.17.0.
+
+## License
+
+This repository is licensed under Apache-2.0; see [LICENSE](LICENSE).
+The reused Kleinwaks files keep their original Apache-2.0 notices and the
+unchanged [LICENSE-Kleinwaks](formalization/lean/LICENSE-Kleinwaks).

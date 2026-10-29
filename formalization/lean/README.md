@@ -7,8 +7,8 @@ theorem c3a_gt_121418 : (60709 / 50000 : ℝ) < MaskedDigit.C3a
 ```
 
 `MaskedDigit.C3a` is exactly Logan Kleinwaks's definition, retained unchanged
-in `RequestProject/GHRConstant.lean`. There are no new axioms, `sorry`, or
-`admit` in the sources.
+in `RequestProject/GHRConstant.lean`. The proof development has no new axioms or unresolved proof holes.
+`Challenge.lean` has one deliberate theorem placeholder for Comparator.
 
 ## Reproduce
 
@@ -20,8 +20,10 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-Pinned versions: Lean 4.28.0 and Mathlib v4.28.0, commit
-`8f9d9cff6bd728b17a24e163c9402775d9e6a365`. The manifest pins all dependencies.
+Pinned versions: Lean 4.35.0-rc2 and Mathlib commit
+`065356127b1dc0016f66b7283ce0ce2c4055aa55`. Palomar requires at least
+Lean 4.35.0-rc2; this pair is also used by Kleinwaks's registered
+`sum-difference` template. The manifest pins all dependencies.
 The repository's Python verifier remains independent of this proof.
 
 ## Finite construction
@@ -82,7 +84,31 @@ See `evidence/AXIOMS.txt`; regenerate it with `AxiomAudit.lean`.
 All ten files under `RequestProject/` are copied from Logan Kleinwaks's
 [masked-digit-sum-difference-bound](https://github.com/kleinwaks/masked-digit-sum-difference-bound),
 commit `352ab86effecb7efce415507a8c781ec158b86e0`, under Apache-2.0.
-Their contents are unchanged except for added attribution headers.
+Their mathematical content is unchanged; only module-system visibility
+scaffolding was added. Their original
+Apache-2.0 notices and `LICENSE-Kleinwaks` are preserved unchanged.
 The license is included as `LICENSE-Kleinwaks`.
 `VectorWords.lean` adapts his weighted-count and type-word arguments;
 its header credits him. New work is by Carson Olafson with GPT-6 Astra assistance.
+
+## Palomar layout
+
+- `Challenge.lean` imports only Mathlib and restates the concrete definitions
+  of `MaskedDigit.sumFinset`, `diffFinset`, `GHRAdmissible`, and `C3a`.
+- `Solution.lean` proves `PalomarC3a.c3a_gt_121418` from the existing theorem.
+- `comparator.json` selects that theorem. `definition_names` is empty:
+  all definitions have concrete bodies checked in the theorem's statement
+  closure, rather than definition holes that a solution may fill.
+- `formalization.yaml` records sources, scope, AI contributions, and review.
+- The root `.github/workflows/palomar-preflight.yml` runs the full pinned
+  Palomar mechanical workflow on pushes to `palomar` and manual dispatches.
+  Its project, Comparator, and metadata paths are repository-relative.
+
+All project Lean files use `module`, public imports, and exposed public
+interfaces. `lake build` includes Challenge, Solution, and all RequestProject
+modules. The axiom audit also checks the compared theorem. The only intentional
+`sorry` is the Challenge theorem; Solution does not import Challenge.
+
+The root Apache-2.0 license covers Carson's material. Reused Kleinwaks files
+retain their original Apache-2.0 notices. A passing mechanical preflight is
+not a Palomar submission, editorial clearance, registration, or human review.

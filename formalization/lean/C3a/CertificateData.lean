@@ -1,9 +1,13 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 Uses Logan Kleinwaks's MaskData API (Apache-2.0; see LICENSE-Kleinwaks).
 -/
-import RequestProject.MaskData
+public import RequestProject.MaskData
+
+@[expose] public section
 
 /-! # Exact finite alphabet and witness costs
 

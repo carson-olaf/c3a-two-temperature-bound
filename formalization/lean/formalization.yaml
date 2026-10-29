@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: v0.4
+project:
+  name: "A finite two-temperature lower bound for the GHR sum-difference constant"
+  description: >-
+    The Gyarmati-Hennecart-Ruzsa constant C₃ₐ is the supremum of real exponents
+    theta for which every K > 1 admits a positive constant c and arbitrarily
+    large nonempty finite integer sets X with nonempty partners Y satisfying
+    |X+Y| <= K|X| and c|X+Y|^theta <= |X-Y|. This formalization proves the
+    strict bound C₃ₐ > 60709/50000 = 1.21418. A finite type at depth 10^13,
+    separate difference and sum tilts, cyclic compression, and a proved
+    finite-set principle supply the bound. The result concerns extremal
+    sumset and difference-set growth in additive combinatorics. The paper's
+    general limiting theorem is outside the formalized claim.
+  authors: [Carson Olafson]
+  responsible_maintainers: [Carson Olafson]
+  license: Apache-2.0
+classification:
+  arxiv: [math.CO, math.NT]
+  msc2020: [11B30]
+sources:
+  - title: "Two-temperature cyclic compression for the Gyarmati-Hennecart-Ruzsa constant"
+    authors: [Carson Olafson]
+    type: paper
+    location: "c3a_two_temperature_proof.md and c3a_two_temperature_proof.pdf at the repository root, sections 6–7"
+    relationship: formalizes
+    author_endorsement: participated
+    note: >-
+      The accompanying manuscript presents the result. The formalization proves
+      its strict finite bound; it does not formalize the general limiting
+      theorem. The manuscript's finite-proof revision is dated October 29, 2026.
+      No claim of external peer review or established priority is made.
+  - title: "Improved lower bound for the Gyarmati-Hennecart-Ruzsa sum-difference constant using masked digits and controlled carries"
+    authors: [Logan Kleinwaks]
+    type: paper
+    id: "https://github.com/kleinwaks/masked-digit-sum-difference-bound/tree/352ab86effecb7efce415507a8c781ec158b86e0/proof"
+    relationship: background
+    note: >-
+      Source of the GHR constant presentation, finite-set principle,
+      masked-digit weighted counts, and analytic estimates used here.
+      The corresponding Apache-2.0 Lean code is credited separately below.
+      No endorsement of this submission by Kleinwaks is claimed.
+  - title: "Sums and differences of finite sets"
+    authors: [Katalin Gyarmati, François Hennecart, Imre Z. Ruzsa]
+    type: paper
+    id: "https://doi.org/10.7169/facm/1229618749"
+    relationship: background
+    note: >-
+      Source of the small-sumset exponent and finite-set principle. The needed
+      principle has a Lean proof in the reused RequestProject code; it is
+      not assumed as a new axiom.
+related_formalizations:
+  - id: "https://github.com/kleinwaks/masked-digit-sum-difference-bound/tree/352ab86effecb7efce415507a8c781ec158b86e0/formalization/lean"
+    relationship: builds-on
+    note: >-
+      Ten RequestProject files are reused under Apache-2.0. Original copyright
+      notices and LICENSE-Kleinwaks are preserved. Only module-system visibility scaffolding was added to those ten files;
+      their mathematical content is unchanged.
+      C3a/VectorWords.lean adapts the weighted-count and type-word arguments.
+      Challenge restates the concrete sumFinset, diffFinset, GHRAdmissible,
+      and C3a definitions, preserving their bodies and quantifiers.
+  - id: "https://github.com/kleinwaks/sum-difference/tree/9bd88c1a14ecedc6ecc6d96eb6403a62d9fc0989"
+    relationship: other
+    note: >-
+      Packaging reference for the Challenge/Solution layout and the compatible
+      Lean and Mathlib pins. No mathematical result from this project is used.
+status:
+  scope: >-
+    The unconditional strict rational bound is proved using Kleinwaks's
+    concrete GHRAdmissible and supremum definitions. Comparator checks
+    PalomarC3a.c3a_gt_121418; C3a.c3a_gt_121418 remains the original proof API.
+    The four concrete definitions belong to the compared theorem's statement
+    closure. definition_names is empty because there are no definition holes.
+    Challenge contains one intentional theorem placeholder; the Solution and
+    proof development contain no unresolved proof holes or new axioms.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: [propext, Classical.choice, Quot.sound]
+  main_results:
+    - declaration: PalomarC3a.c3a_gt_121418
+      file: Solution.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+      comparator_config: comparator.json
+      literature_dependencies: []
+automation:
+  methods:
+    - method: agent
+      models: [GPT-6 Astra]
+      tool_setup: >-
+        Wrote the Lean formalization, replaced native finite checks with
+        kernel-checked proofs, and prepared the module-system port and Palomar
+        interface. Lean, Lake, Mathlib tactics, exact rational arithmetic,
+        and kernel evaluation are used for verification.
+    - method: agent
+      models: [Claude (exact model not recorded)]
+      tool_setup: >-
+        Adversarial referee review of the first version, as reported by the
+        maintainer. This is separate from authorship of the Lean proof and
+        is not claimed as a review of the final Palomar branch.
+  notes: >-
+    Carson Olafson is the human author and responsible maintainer. AI systems
+    are credited here as tools, not as project authors. ChatGPT also assisted
+    the research, written argument, and independent verification programs as
+    disclosed in the root README. TODO: identify the exact Claude model and
+    review date if that historical record can be recovered; neither is known
+    from the supplied evidence. Costs and complete prompt logs are not recorded.
+fidelity:
+  divergences: >-
+    The claim is the strict finite bound, not the general limiting theorem.
+    The Lean construction uses depth 10^13, floored symmetric type counts,
+    a Bertrand prime above the difference cardinality plus 161, and dilation
+    by two of least-nonnegative integer representatives. This replaces the
+    written argument's endpoint rescaling and the older exact-Gibbs instance.
+    Sections 6–7 of the paper distinguish the constructions. The legacy Python
+    and C++ certificates use a different, much larger depth and are not the
+    finite instance in Lean. The definitions of admissibility and C₃ₐ retain
+    Kleinwaks's mathematical meaning. Novelty and priority are not established
+    by this formalization or by a mechanical preflight.
+review:
+  status: agent-reviewed
+  reviewers: [Claude (exact model not recorded)]
+  notes: >-
+    The first version received an adversarial Claude review. The historical
+    INDEPENDENT_AUDIT_REPORT.md concerns the written argument and arithmetic,
+    predates the completed Lean proof, and is not evidence of a final-branch
+    Lean or human review. Local build and axiom checks are mechanical checks
+    performed by the implementation agent. No external human peer review,
+    Palomar editorial clearance, or registration is claimed.
+alignment:
+  namespace: "PalomarC3a (comparison interface); C3a and MaskedDigit (proof)"
+  statements:
+    - source: "Accompanying paper, sections 6–7: strict finite bound"
+      lean: PalomarC3a.c3a_gt_121418
+      module: Solution
+      status: proved
+      note: "Supplied directly by C3a.c3a_gt_121418."
+acknowledgements: >-
+  Logan Kleinwaks for the Apache-2.0 proof infrastructure and earlier public
+  feedback; Gyarmati, Hennecart, and Ruzsa for the finite-set principle;
+  Lean and Mathlib contributors for the verification libraries and tools.

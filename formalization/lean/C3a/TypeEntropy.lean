@@ -1,9 +1,13 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 Uses Logan Kleinwaks's effective Stirling upper bound, Apache-2.0.
 -/
-import RequestProject.StirlingBounds
+public import RequestProject.StirlingBounds
+
+@[expose] public section
 
 /-! # A finite multinomial estimate from a common Gibbs envelope -/
 open scoped BigOperators

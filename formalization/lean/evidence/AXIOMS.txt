@@ -4,3 +4,4 @@ C3a.c3a_gt_121418 : 60709 / 50000 < MaskedDigit.C3a
 'C3a.exists_integer_compression' depends on axioms: [propext, Classical.choice, Quot.sound]
 'C3a.log_multinomial_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
 'MaskedDigit.ghr_finite_set_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PalomarC3a.c3a_gt_121418' depends on axioms: [propext, Classical.choice, Quot.sound]

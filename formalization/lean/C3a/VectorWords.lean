@@ -1,10 +1,14 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 Weighted counting proof adapted from Logan Kleinwaks, CoreConstruction.lean,
 Apache-2.0; see LICENSE-Kleinwaks.
 -/
-import RequestProject.FiniteTypeWords
+public import RequestProject.FiniteTypeWords
+
+@[expose] public section
 
 /-! # Finite vector words with a digit budget -/
 open scoped BigOperators Pointwise

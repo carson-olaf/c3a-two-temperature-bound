@@ -1,10 +1,14 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 Uses Logan Kleinwaks's GHR definition and proved dilation principle,
 Apache-2.0; see LICENSE-Kleinwaks.
 -/
-import C3a.IntegerCompression
+public import C3a.IntegerCompression
+
+@[expose] public section
 
 /-! # A finite certificate interface for the GHR constant
 

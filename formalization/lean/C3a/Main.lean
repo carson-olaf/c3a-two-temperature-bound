@@ -1,13 +1,17 @@
+module
+
 /-
 Copyright (c) 2026 Carson Olafson. Released under Apache 2.0.
 Author: Carson Olafson, with GPT-6 Astra assistance.
 Uses Logan Kleinwaks's GHR constant, finite-set principle, type counting,
 and Stirling estimates under Apache-2.0; see LICENSE-Kleinwaks.
 -/
-import C3a.VectorWords
-import C3a.TypeEntropy
-import C3a.FiniteAssembly
-import C3a.LogNumerics
+public import C3a.VectorWords
+public import C3a.TypeEntropy
+public import C3a.FiniteAssembly
+public import C3a.LogNumerics
+
+@[expose] public section
 
 /-! # The finite two-temperature bound
 

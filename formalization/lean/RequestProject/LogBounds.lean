@@ -1,10 +1,14 @@
+module
+
 /-
 Copyright (c) 2026 Logan Kleinwaks. All rights reserved.
 Released under Apache 2.0 license; see LICENSE-Kleinwaks.
 Reused from kleinwaks/masked-digit-sum-difference-bound,
 commit 352ab86effecb7efce415507a8c781ec158b86e0.
 -/
-import Mathlib
+public import Mathlib
+
+@[expose] public section
 
 /-!
 # Certified rational bounds for logarithms
