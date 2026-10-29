@@ -6,6 +6,8 @@ Released under Apache 2.0 license; see LICENSE-Kleinwaks.
 Reused from kleinwaks/masked-digit-sum-difference-bound,
 commit 352ab86effecb7efce415507a8c781ec158b86e0.
 -/
+/- Modified by Carson Olafson with GPT-6 Astra: ported module visibility
+for Lean 4.35.0-rc2; mathematical declarations and proofs are unchanged. -/
 public import Mathlib
 public import RequestProject.GHRDigits
 
