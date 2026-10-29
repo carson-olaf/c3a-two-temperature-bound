@@ -720,10 +720,14 @@ and `RequestProject/GHRConstant.lean`. They are not assumed axioms.
 The general limiting Theorem 3.1 is not formalized here and is not needed
 by the finite theorem.
 
-The pinned environment is Lean 4.28.0 and Mathlib v4.28.0. The Mathlib
-commit is:
+The submitted proof pins Lean 4.35.0-rc2 and the Mathlib commit
 
-`8f9d9cff6bd728b17a24e163c9402775d9e6a365`.
+`065356127b1dc0016f66b7283ce0ce2c4055aa55`
+
+in `formalization/lean/lean-toolchain` and `lake-manifest.json`. The proof
+was first built and kernel-checked with Lean 4.28.0 and Mathlib v4.28.0
+(commit `8f9d9cff6bd728b17a24e163c9402775d9e6a365`), then ported to Lean's
+module system for registration.
 
 Run the axiom audit with
 `lake env lean AxiomAudit.lean` from `formalization/lean/`.
