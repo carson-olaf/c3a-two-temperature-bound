@@ -1,11 +1,11 @@
 # Two-temperature cyclic compression for the Gyarmati-Hennecart-Ruzsa constant
 
 **Carson Olafson**  
-August 19, 2026
+August 19, 2026; finite-proof revision October 29, 2026
 
 ## Status and result
 
-This note gives a new candidate proof that
+This note gives a proof, with a Lean-verified finite instance in §6, that
 
 \[
 \boxed{C_{3a}>1.21418}.
@@ -49,10 +49,10 @@ while the entropy-matched limiting value is
 The conservative claim is only the strict rationally certified inequality
 \(C_{3a}>1.21418\).
 
-The numerical certificate is machine checked by two independently structured
-programs. The two-temperature theorem and the finite-set lemma remain written
-mathematical arguments; this package is not a Lean formalization or an
-externally refereed publication.
+The numerical inputs are checked by two independently structured programs.
+The strict finite bound is also proved end to end in Lean 4, as described in
+§6–7. The general limiting theorem remains a written argument. This package
+is not an externally refereed publication.
 
 ## 1. The finite-set principle
 
@@ -440,7 +440,7 @@ H=\langle4,5\rangle.
 It has conductor \(12\) and exactly six gaps:
 
 \[
-\mathbb N_0\setminus H=\{1,2,3,6,7,11\}.
+\mathbb N_0\mathbin{\backslash} H=\{1,2,3,6,7,11\}.
 \]
 
 Take
@@ -574,110 +574,203 @@ P_+(y)&=3.66110218660138413370190644948\ldots,\\
 \end{aligned}
 \]
 
-## 6. One explicit finite GHR seed
+## 6. The Lean-verified finite GHR seed
 
-Because \(x\) is rational, clear a common degree \(D_0=160\). For each
-\(d\in M-M\), put
+The formal proof uses one finite depth
 
 \[
-\omega_d=8149^{\kappa(d)}10000^{160-\kappa(d)}.
+N=10^{13},\qquad x=\frac{8149}{10000},\qquad y=\frac{42571}{50000}.
 \]
 
-Define
+Let \(D=M-M=[-80,80]\) and \(Z=P_-(x)\). For \(d>0\), set
 
 \[
-N=\sum_d\omega_d,
+n_d=n_{-d}=\left\lfloor\frac{Nx^{\kappa(d)}}Z\right\rfloor,
 \qquad
-2L=\sum_d\kappa(d)\omega_d.
+n_0=N-2\sum_{d=1}^{80}n_d,
+\qquad
+L=\sum_{d=1}^{80}n_d\kappa(d).
 \]
 
-Then \(\omega_d/N\) is exactly the Gibbs distribution, \(2L\) is even, and
+The exact finite checks in `formalization/lean/C3a/CertificateData.lean`
+prove that all counts are positive, their sum is \(N\), and
 
 \[
-V=\left\{a\in M^N:\sum_i a_i\le L\right\}.
+n_0=1917647564302,\qquad 2L=76435323145630.
 \]
 
-Let \(W\) be the exact type class containing \(\omega_d\) copies of each
-\(d\). Its two witness budgets are exactly \(L\), so \(W\subset V-V\).
-
-Set
+Write \(\mathcal V\) for the vector set, reserving \(V\) below for the
+integer seed after dilation:
 
 \[
-T=\left\lfloor\left(\frac{249293}{10000}\right)^N\right\rfloor,
+\mathcal V=\left\{a\in M^N:\sum_i a_i\le L\right\}.
 \]
 
-and let \(p\) be the least prime greater than \(T\). Since
-\(|V-V|<R^N\), we have \(|V-V|\le T<p\). Bertrand's postulate gives
-\(p<2T<2R^N\). Choose the quotient map by the canonical conditional-
-expectation rule from Lemma 2.1, rescale canonically so that a nonzero image
-element becomes \(-1\), and let \(A\subset[0,p-1]\) be the least-
-nonnegative representative set.
-
-The standard finite type-class estimate is
+Let \(W\subset D^N\) be the type class with counts \((n_d)\).
+Symmetry makes the two minimum-witness budgets equal to \(L\), so
+\(W\subset\mathcal V-\mathcal V\), and exact finite type counting gives
 
 \[
-|W|\ge\frac{e^{N\rho}}{(N+1)^{|M-M|}}.
+|W|\prod_{d\in D}n_d!=N!.
 \]
 
-Together with the quotient bounds and \(2p-1<4R^N\), a sufficient finite
-inequality for exponent greater than \(1+\alpha\), where
-\(\alpha=10709/50000\), is
+These statements and the independent tilted upper bounds
 
 \[
-N(\rho-\sigma-\alpha\log R)
->
-|M-M|\log(N+1)+(2+2\alpha)\log2.
+|\mathcal V+\mathcal V|y^{2L}\le P_+(y)^N,
+\qquad
+|\mathcal V-\mathcal V|x^{2L}\le Z^N
+\]
+
+are proved in `C3a/VectorWords.lean`. No limit is taken.
+
+The common envelope
+
+\[
+n_d\le\frac{(N+1000)x^{\kappa(d)}}Z\quad(d\in D)
+\]
+
+covers the floors and the extra zero symbols. Effective Stirling bounds in
+`C3a/TypeEntropy.lean` imply
+
+\[
+\log|W|\ge N\log Z-2L\log x-1000
+ -161\left(\frac{\log N}{2}+1\right).
+\]
+
+The rational logarithm bounds in `C3a/LogNumerics.lean` establish the
+following conservative integer bounds, assembled in `C3a/Main.lean`:
+
+\[
+\begin{aligned}
+\log|W|&\ge a=32160395000000,\\
+\log|\mathcal V+\mathcal V|&\le b=25272245000000,\\
+\log|\mathcal V-\mathcal V|&\le r=32160396000000.
+\end{aligned}
+\]
+
+Put \(m=|\mathcal V-\mathcal V|+161\). Mathlib's proved Bertrand
+postulate supplies a prime
+
+\[
+m<p\le2m.
+\]
+
+In particular, \(p>160\) and \(p>|\mathcal V-\mathcal V|\).
+The finite collision-counting proof in `C3a/CyclicCompression.lean`,
+together with `C3a/IntegerCompression.lean`, gives a linear map
+\(\varphi:\mathbb Z^N\to\mathbb Z/p\mathbb Z\) such that the
+least-nonnegative representative set \(A\subset[0,p-1]\) satisfies
+
+\[
+0\in A,\qquad \max A>0,\qquad
+|A-A|>|W|/2,\qquad |A+A|\le2|\mathcal V+\mathcal V|.
+\]
+
+There is no rescaling to force \(-1\) into the quotient image. Instead,
+use the integer seed \(V=2A=\{2a:a\in A\}\). Dilation preserves sumset
+and difference-set cardinalities and supplies
+
+\[
+|V-V|<2\max V+1=4\max A+1.
+\]
+
+Moreover, since \(|\mathcal V-\mathcal V|\ge1\),
+
+\[
+4\max A+1\le1296|\mathcal V-\mathcal V|,
+\qquad
+\log(4\max A+1)\le r+\log1296<r+8.
+\]
+
+Logan Kleinwaks's proved GHR dilation principle applies to this one finite
+seed. With \(\alpha=10709/50000\), the final comparison is
+
+\[
+\alpha(r+8)+b+2<a,
 \tag{6.1}
 \]
 
-The verifier proves (6.1) with rigorous rational intervals. Thus the result is
-not only a limit statement: the algorithm above specifies one finite GHR seed
-whose exponent exceeds \(1.21418\).
+whose exact positive slack is \(36384716.28656\). Since \(\log4<2\),
+this implies that the GHR exponent of \(V\) exceeds \(1+\alpha\).
+The closed Lean theorem is
 
-The exact integers have
-
-\[
-\operatorname{bitlen}(N)=2129,
-\qquad
-\operatorname{bitlen}(L)=2131.
-\]
-
-Their big-endian byte hashes are
-
-```text
-N  a9db0611a20142dca241b32363fbb535cc64e9755d312f659edfe966add9e417
-L  0f4a6eaef4e3f2387da12a5f1a0a2252c5cf929be806ee423a39957f137737e3
+```lean
+C3a.c3a_gt_121418 : (60709 / 50000 : Real) < MaskedDigit.C3a
 ```
 
-The complete decimal expansions are in the generated certificate directory.
-The prime, quotient coefficients, and all elements of \(A\) are finitely and
-canonically specified but are not materialized.
+Here `MaskedDigit.C3a` is exactly Kleinwaks's definition in
+`RequestProject/GHRConstant.lean`. His admissibility predicate requires the
+construction for every \(K>1\), so its lower bound also implies the bound
+under the definition in Tao's problem 3a.
 
-## 7. Verification boundary
+The prime, coefficient vector, and finite sets are specified by existence
+proofs, not materialized. The rate \(R=249293/10000\) belongs to the
+limiting comparison in §5; it is not used to choose the prime in this
+finite proof.
 
-The Python standard-library verifier performs:
+## 7. Verification boundary and attribution
 
-1. exact reconstruction of \(\langle4,5\rangle\cap[0,80]\);
-2. exact reconstruction of \(M+M\), \(M-M\), every \(\kappa(d)\), and the
-   partition-polynomial numerators;
-3. exact rational enclosures for \(P_-\), \(P_+\), and \(\mu\);
-4. rigorous rational enclosures for every logarithm;
-5. the strict rate and exponent comparisons (5.1)-(5.2);
-6. the explicit finite-size correction (6.1);
-7. reconstruction and hashing of the exact finite \(N,L\).
+The end-to-end Lean proof of the strict finite bound is
+`formalization/lean/C3a/Main.lean`. It includes the finite type argument,
+weighted counts, quotient existence, integer lifts, and final inequality.
+Bertrand's postulate is proved in Mathlib; the GHR finite-set and dilation
+principles are proved in the reused files `RequestProject/GHRDigits.lean`
+and `RequestProject/GHRConstant.lean`. They are not assumed axioms.
+The general limiting Theorem 3.1 is not formalized here and is not needed
+by the finite theorem.
 
-An independently written C++/GMP verifier uses Apéry shortest paths,
-intersection scanning for minimum witnesses, sparse monomial evaluation, and
-its own rational logarithm implementation. The two programs emit byte-for-
-byte identical masks, supports, difference-cost tables, and finite parameters.
+The pinned environment is Lean 4.28.0 and Mathlib v4.28.0. The Mathlib
+commit is:
 
-The programs do **not** formally prove Theorem 3.1, the method-of-types bound,
-Bertrand's postulate, or the GHR finite-set lemma. Those remain written
-mathematical arguments in this note.
+`8f9d9cff6bd728b17a24e163c9402775d9e6a365`.
+
+Run the axiom audit with
+`lake env lean AxiomAudit.lean` from `formalization/lean/`.
+The main theorem depends only on the standard axioms `propext`,
+`Classical.choice`, and `Quot.sound`. All 17 original native finite checks
+now have kernel-checked proofs, using interval arguments, exact rational
+identities, `decide +kernel`, and `norm_num`. Neither `Lean.ofReduceBool`
+nor `Lean.trustCompiler` occurs in the theorem's axiom list.
+
+The verbatim audit is in `formalization/lean/evidence/AXIOMS.txt`, and
+`evidence/KERNEL_CHECKS.md` records the replacements and timings. The
+earlier native version remains available at commit
+`5bbc2a5eb4d01eb3eb24fb909f819a8d220653f8`. Neither an independent agent
+review nor a local build is a claim of journal refereeing or maintainer
+acceptance.
+
+Logan Kleinwaks's Apache-2.0 code is reused from
+`kleinwaks/masked-digit-sum-difference-bound`, commit
+`352ab86effecb7efce415507a8c781ec158b86e0`. The ten files under
+`RequestProject/` are unchanged apart from attribution headers. They provide
+the GHR definition and principles, mask infrastructure, type counting,
+Stirling estimates, and logarithm bounds. The new vector-word proof adapts
+his weighted-count and type-word arguments. The license and detailed
+attribution are in `formalization/lean/`.
+
+The original Python and C++/GMP verifiers remain independent exact checks
+of the alphabet, costs, partition sums, and the §5 inequalities. They also
+check an older, different exact-Gibbs finite instance: its depth has 2129
+bits and its prime is chosen above \(\lfloor R^N\rfloor\), followed by
+rescaling. Accordingly, `certificate/N.txt`, `certificate/L.txt`, their
+hashes, and those programs' finite-size output describe that legacy
+instance, not the \(N=10^{13}\) Lean instance in §6. Those artifacts are
+preserved unchanged for reproducibility; they are not inputs or axioms of
+the Lean proof.
 
 ## 8. Reproduction
 
-Python, standard library only:
+Primary finite proof, from `formalization/lean/`:
+
+```bash
+lake exe cache get
+lake build
+lake env lean AxiomAudit.lean
+```
+
+Independent numerical and legacy-instance checks, using Python's standard
+library only:
 
 ```bash
 python3 verification/verify_c3a_two_temperature_121418.py --emit certificate
@@ -705,9 +798,8 @@ Carson Olafson used ChatGPT extensively to explore constructions, formulate the
 two-temperature argument, draft and revise this note, generate the verification
 programs, and audit the resulting package. Carson selected the research
 direction, ran and reviewed the verification outputs, and is the human
-contributor responsible for this submission. This note is neither externally
-refereed nor formally verified; independent review of Theorem 3.1 is expressly
-invited.
+contributor responsible for this submission. The finite bound in §6 is
+formally verified; this note is not externally refereed. Independent review of the general Theorem 3.1 is expressly invited.
 
 ## References
 

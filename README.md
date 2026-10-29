@@ -12,7 +12,7 @@ C_{3a}>1.21418.
 - Inner alphabet: `M = <4,5> intersect [0,80]`.
 - Difference tilt: `x = 8149/10000`.
 - Sum tilt: `y = 42571/50000`.
-- Cyclic quotient rate: `R = 249293/10000`.
+- Limiting quotient rate: `R = 249293/10000` (not used by the Lean prime choice).
 - Certified target: `1.21418 = 60709/50000`.
 
 The proof is in `c3a_two_temperature_proof.md` and
@@ -33,10 +33,13 @@ theorem c3a_gt_121418 : (60709 / 50000 : ℝ) < MaskedDigit.C3a
 ```
 
 It uses a single finite type at depth `10^13`, with the same alphabet and
-`x`, `y` as above. Bertrand's prime is chosen above `|V-V| + 161`; the
-formalization uses dilation instead of the written proof's rescaling.
-No limit argument is required. The finite checks use `native_decide`;
-the axiom report includes `Lean.ofReduceBool` and `Lean.trustCompiler`.
+`x`, `y` as above. Bertrand's prime is chosen above the vector difference
+cardinality plus 161, and the integer seed is the dilation `V = 2A`.
+No limit argument is required. All finite checks now have kernel proofs;
+the main theorem depends only on `propext`, `Classical.choice`, and
+`Quot.sound`. Neither `Lean.ofReduceBool` nor `Lean.trustCompiler` remains.
+The [kernel-check report](formalization/lean/evidence/KERNEL_CHECKS.md) records
+all 17 replacements and preserves the earlier native version by commit.
 
 Logan Kleinwaks's GHR principle, type-counting infrastructure, and analytic
 bounds are reused under Apache-2.0 with attribution in every reused file.
@@ -49,7 +52,7 @@ baseline; the structured alphabet above improves it to the certified target.
 Kleinwaks's separate Lean-formalized controlled-carry result is available in
 [PR #146](https://github.com/teorth/optimizationproblems/pull/146).
 
-## Fast verification
+## Independent arithmetic and legacy-instance verification
 
 Python 3, standard library only:
 
@@ -84,10 +87,16 @@ logical and computational boundaries in neutral, publication-facing language.
 
 ## Trust boundary
 
-The programs machine-check the finite combinatorial reconstruction, numerical
-hypotheses, and finite-size correction. They do not formally verify the
-human proof of the two-temperature cyclic-quotient theorem, Bertrand's
-postulate, the method-of-types inequality, or the GHR finite-set lemma.
+The Lean theorem proves the strict finite bound end to end, including finite
+type counting, cyclic compression, a Mathlib proof of Bertrand's postulate,
+and Kleinwaks's proved GHR principle. The general limiting theorem is not
+formalized and is not used by the finite proof. See the axiom report above.
+
+The Python and C++ programs independently check the alphabet, numerical
+hypotheses, and an older exact-Gibbs finite instance. Their 2129-bit depth
+and `certificate/N.txt` and `certificate/L.txt` are legacy data, not the
+`N = 10^13` instance in the Lean proof. The paper's §6–7 now distinguishes
+the two constructions.
 
 ## AI-use disclosure
 
@@ -98,3 +107,9 @@ direction, ran and reviewed the verification outputs, and is the human
 contributor responsible for the submission. References and externally sourced
 claims were checked against the cited sources; independent review of the new
 theorem is expressly invited.
+
+## Rebuild the paper
+
+With Pandoc and Tectonic installed, run `scripts/build-paper.sh`. It rebuilds
+both the TeX source and PDF from the Markdown paper. `PANDOC` and `TECTONIC`
+can specify executable paths. This revision used Pandoc 3.9 and Tectonic 0.17.0.
