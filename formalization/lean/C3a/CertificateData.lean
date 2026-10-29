@@ -7,13 +7,14 @@ import RequestProject.MaskData
 
 /-! # Exact finite alphabet and witness costs
 
-The `native_decide` checks in this file use Lean.ofReduceBool. They enumerate
-only the finite alphabet, never words of length 10^13 or the quotient prime.
+The finite checks in this file use kernel reduction. They enumerate only the
+finite alphabet, never words of length 10^13 or the quotient prime.
 -/
 open scoped BigOperators
 open Finset
 
 set_option maxRecDepth 8000
+set_option maxHeartbeats 10000000
 
 namespace C3a
 
@@ -27,7 +28,7 @@ def data : MaskedDigit.MaskData where
   B_pos := by decide
   q_gt_B := by decide
   zero_mem := by decide
-  digits_le := by native_decide
+  digits_le := by decide +kernel
   B_mem := by decide
 
 /-- Explicit minimum costs at the six gaps; all other costs are |d|. -/
@@ -41,23 +42,73 @@ def cost (d : ℤ) : ℕ :=
   | 11 => 19
   | k => k
 
-theorem mask_card : mask.card = 75 := by native_decide
+theorem mask_card : mask.card = 75 := by decide +kernel
 
 theorem sum_support : data.sumSupport = {0, 4, 5, 8, 9, 10} ∪ Icc 12 160 := by
-  native_decide
+  ext s
+  rw [MaskedDigit.MaskData.mem_sumSupport]
+  change (∃ a ∈ mask, ∃ b ∈ mask, a + b = s) ↔ _
+  constructor
+  · rintro ⟨a, ha, b, hb, rfl⟩
+    simp only [mask, mem_union, mem_insert, mem_singleton, mem_Icc] at ha hb ⊢
+    omega
+  · intro hs
+    simp only [mem_union, mem_insert, mem_singleton, mem_Icc] at hs
+    by_cases h : s ≤ 80
+    · refine ⟨0, by decide, s, ?_, by omega⟩
+      simp only [mask, mem_union, mem_insert, mem_singleton, mem_Icc]
+      omega
+    · by_cases h' : s < 92
+      · refine ⟨68, by decide, s - 68, ?_, by omega⟩
+        simp only [mask, mem_union, mem_insert, mem_singleton, mem_Icc]
+        omega
+      · refine ⟨80, by decide, s - 80, ?_, by omega⟩
+        simp only [mask, mem_union, mem_insert, mem_singleton, mem_Icc]
+        omega
 
-theorem diff_support : data.diffSupport = Icc (-80) 80 := by native_decide
+theorem diff_support : data.diffSupport = Icc (-80) 80 := by
+  have hp (n : ℕ) (hn : n ≤ 80) : (n : ℤ) ∈ data.diffSupport := by
+    rw [MaskedDigit.MaskData.mem_diffSupport]
+    change ∃ a ∈ mask, ∃ b ∈ mask, (a : ℤ) - b = n
+    by_cases h : n ≤ 68
+    · refine ⟨80, by decide, 80 - n, ?_, ?_⟩
+      · simp only [mask, mem_union, mem_insert, mem_singleton, mem_Icc]
+        omega
+      · omega
+    · refine ⟨n, ?_, 0, by decide, by simp⟩
+      simp only [mask, mem_union, mem_insert, mem_singleton, mem_Icc]
+      omega
+  ext d
+  constructor
+  · intro hd
+    have h := data.abs_le_of_mem_diffSupport hd
+    change |d| ≤ (80 : ℤ) at h
+    simpa only [mem_Icc, abs_le] using h
+  · intro hd
+    have hb := mem_Icc.mp hd
+    by_cases h : 0 ≤ d
+    · have he : (d.toNat : ℤ) = d := by omega
+      rw [← he]
+      exact hp _ (by omega)
+    · have he : ((-d).toNat : ℤ) = -d := by omega
+      have hm := data.neg_mem_diffSupport (hp (-d).toNat (by omega))
+      simpa only [he, neg_neg] using hm
 
-theorem sum_card : data.sumSupport.card = 155 := by native_decide
+theorem sum_card : data.sumSupport.card = 155 := by
+  rw [sum_support]
+  decide +kernel
 
-theorem diff_card : data.diffSupport.card = 161 := by native_decide
+theorem diff_card : data.diffSupport.card = 161 := by
+  rw [diff_support]
+  decide +kernel
 
 theorem cost_lower : ∀ a ∈ mask, ∀ b ∈ mask, cost ((a : ℤ) - b) ≤ a + b := by
-  native_decide
+  decide +kernel
 
 theorem cost_witness : ∀ d ∈ data.diffSupport,
     ∃ a ∈ mask, ∃ b ∈ mask, (a : ℤ) - b = d ∧ a + b = cost d := by
-  native_decide
+  rw [diff_support]
+  decide +kernel
 
 /-- The explicit table is proved equal to the minimum in Kleinwaks's definition. -/
 theorem kappa_eq_cost {d : ℤ} (hd : d ∈ data.diffSupport) : data.kappa d = cost d := by
@@ -74,53 +125,82 @@ def rate : ℚ := 249293 / 10000
 def target : ℚ := 60709 / 50000
 def depth : ℕ := 10 ^ 13
 
-def minusPartition : ℚ := ∑ d ∈ data.diffSupport, x ^ cost d
-def plusPartition : ℚ := ∑ s ∈ data.sumSupport, y ^ s
+/-- Use the proved support intervals to keep kernel reduction shallow. -/
+def minusPartition : ℚ := ∑ d ∈ Icc (-80 : ℤ) 80, x ^ cost d
+def plusPartition : ℚ := ∑ s ∈ ({0, 4, 5, 8, 9, 10} ∪ Icc 12 160 : Finset ℕ), y ^ s
 
-def meanCost : ℚ := (∑ d ∈ data.diffSupport, (cost d : ℚ) * x ^ cost d) / minusPartition
+def meanCost : ℚ := (∑ d ∈ Icc (-80 : ℤ) 80, (cost d : ℚ) * x ^ cost d) / minusPartition
+
+theorem minusPartition_exact : minusPartition = (260736127602115677663389167809337979580964059231370842707873321852831826607587846180571495643967168034802963048433214486964811046812117954684560461992922075597236469440576765723337606186447067645809764991409623855548860213238157077500921971435418538281067386818069408492247197388649733726419110260895047781855526142938001 : ℚ) / 50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 := by
+  unfold minusPartition
+  decide +kernel
+
+theorem plusPartition_exact : plusPartition = (250502776944372532003651142138557208699059597632139242344132272207256801834113880197991903697263643347011092550334944577312387311578649024936321541235562445709693139632042410040478373518704721433933773426865012326027528539067384813759643851265029270833386254340317004204260597890381940189204043419034356222469020404246801793037688221104541360983195230936394187833948287915702564001022572591338100464871441522117141882882868815251785911267488055338244599818473892987160221877352094367371183805818685956594164796577581490588404370246305445794263999825810509075933926568441634594397571171337805899039711068270631911807724140645920410465797129314788849357841001088428895244165535993268487897083581814975425861617772102642299094673172910979954387796988249201 : ℚ) / 68422776578360208541197733559077936097669040130689246667825599799306205209270537181964755291119217872619628906250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 := by
+  unfold plusPartition
+  decide +kernel
 
 theorem minusPartition_bounds :
     5214722552042 / 10^12 < minusPartition ∧ minusPartition < 5214722552043 / 10^12 := by
-  native_decide
+  rw [minusPartition_exact]
+  norm_num
 
 theorem plusPartition_bounds :
     3661102186601 / 10^12 < plusPartition ∧ plusPartition < 3661102186602 / 10^12 := by
-  native_decide
+  rw [plusPartition_exact]
+  norm_num
 
 theorem meanCost_bounds :
     7643532314898 / 10^12 < meanCost ∧ meanCost < 7643532314899 / 10^12 := by
-  native_decide
+  unfold meanCost
+  rw [minusPartition_exact]
+  decide +kernel
 
 theorem Pminus_eq : data.Pminus (x : ℝ) = (minusPartition : ℝ) := by
   unfold MaskedDigit.MaskData.Pminus minusPartition
   push_cast
+  rw [← diff_support]
   exact sum_congr rfl (fun d hd => by rw [kappa_eq_cost hd])
 
 theorem Pplus_eq : data.Pplus (y : ℝ) = (plusPartition : ℝ) := by
-  simp [MaskedDigit.MaskData.Pplus, plusPartition]
+  simp [MaskedDigit.MaskData.Pplus, plusPartition, sum_support]
 
 /-- Symmetric floored counts; all unused positions carry the zero symbol. -/
 def posCount (d : ℤ) : ℕ := ⌊(depth : ℚ) * x ^ cost d / minusPartition⌋₊
-def zeroCount : ℕ := depth - 2 * ∑ d ∈ data.diffSupport.filter (fun d => 0 < d), posCount d
+def zeroCount : ℕ := depth - 2 * ∑ d ∈ Icc (1 : ℤ) 80, posCount d
 def count (d : ℤ) : ℕ := if d = 0 then zeroCount else posCount (Int.natAbs d)
-def budget : ℕ := ∑ d ∈ data.diffSupport.filter (fun d => 0 < d), count d * cost d
+def budget : ℕ := ∑ d ∈ Icc (1 : ℤ) 80, count d * cost d
+
+theorem zeroCount_exact : zeroCount = 1917647564302 := by
+  simp only [zeroCount, posCount, minusPartition_exact]
+  decide +kernel
 
 theorem count_symm (d : ℤ) : count (-d) = count d := by simp [count]
 
-theorem count_sum : ∑ d ∈ data.diffSupport, count d = depth := by native_decide
+theorem count_sum : ∑ d ∈ data.diffSupport, count d = depth := by
+  simp only [diff_support, count, zeroCount, posCount, minusPartition_exact]
+  decide +kernel
 
-theorem count_cost : ∑ d ∈ data.diffSupport, count d * cost d = 2 * budget := by native_decide
+theorem count_cost : ∑ d ∈ data.diffSupport, count d * cost d = 2 * budget := by
+  simp only [diff_support, budget, count, zeroCount, posCount, minusPartition_exact]
+  decide +kernel
 
-theorem count_positive : ∀ d ∈ data.diffSupport, 0 < count d := by native_decide
+theorem count_positive : ∀ d ∈ data.diffSupport, 0 < count d := by
+  simp only [diff_support, count, zeroCount, posCount, minusPartition_exact]
+  decide +kernel
 
 /-- One common envelope covers the rounding at zero as well as all floors. -/
 theorem count_envelope : ∀ d ∈ data.diffSupport,
-    (count d : ℚ) ≤ (depth + 1000 : ℚ) * x ^ cost d / minusPartition := by native_decide
+    (count d : ℚ) ≤ (depth + 1000 : ℚ) * x ^ cost d / minusPartition := by
+  simp only [diff_support, count, zeroCount, posCount, minusPartition_exact]
+  decide +kernel
 
-theorem budget_exact : 2 * budget = 76435323145630 := by native_decide
+theorem budget_exact : 2 * budget = 76435323145630 := by
+  simp only [budget, count, zeroCount, posCount, minusPartition_exact]
+  decide +kernel
 
 theorem budget_bounds : 76435323145000 < 2 * budget ∧ 2 * budget < 76435323149000 := by
-  native_decide
+  rw [budget_exact]
+  norm_num
 
 theorem count_kappa : ∑ d ∈ data.diffSupport, count d * data.kappa d = 2 * budget := by
   rw [sum_congr rfl (fun d hd => congrArg (count d * ·) (kappa_eq_cost hd))]

@@ -1,5 +1,5 @@
     8 AxiomAudit.lean
-  129 C3a/CertificateData.lean
+  209 C3a/CertificateData.lean
   162 C3a/CyclicCompression.lean
   110 C3a/FiniteAssembly.lean
   140 C3a/IntegerCompression.lean
@@ -9,7 +9,7 @@
   217 C3a/VectorWords.lean
     1 C3a.lean
   201 LICENSE-Kleinwaks
-   85 README.md
+   88 README.md
   898 RequestProject/CoreConstruction.lean
   208 RequestProject/FiniteTypeWords.lean
   464 RequestProject/GHRConstant.lean
@@ -20,7 +20,7 @@
   195 RequestProject/ProductWeights.lean
    94 RequestProject/StirlingBounds.lean
   162 RequestProject/TypeCount.lean
-   21 STATUS.md
+   24 STATUS.md
    95 lake-manifest.json
    14 lakefile.toml
     1 lean-toolchain

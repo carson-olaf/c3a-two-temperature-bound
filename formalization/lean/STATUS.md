@@ -1,9 +1,12 @@
 # Implementation status
 
-Started 2026-10-29 15:43:20 UTC; six-hour deadline 21:43:20 UTC.
+The finite proof and its kernel-checked numerical refinement are complete.
+The native version is preserved at `5bbc2a5eb4d01eb3eb24fb909f819a8d220653f8`.
 
 The theorem compiles without holes. `lake build` succeeds. Axiom output is in
-`evidence/AXIOMS.txt`. Final handoff includes a separate clean-checkout build.
+`evidence/AXIOMS.txt`. The main theorem now depends only on `propext`, `Classical.choice`, and
+`Quot.sound`. Per-check measurements are in `evidence/KERNEL_CHECKS.md`.
+The final handoff includes a separate clean-checkout build.
 
 - [x] Read the referee plan and written proof.
 - [x] Replay the exact Python numerical verifier.

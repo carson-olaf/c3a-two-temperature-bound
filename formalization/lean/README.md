@@ -67,13 +67,16 @@ The final log-cardinality bounds are `log|W| ≥ 32160395000000`,
 The main axiom list is:
 
 ```text
-[propext, Classical.choice, Lean.ofReduceBool, Lean.trustCompiler, Quot.sound]
+[propext, Classical.choice, Quot.sound]
 ```
 
-`native_decide` is used only for finite alphabet and rational/count checks.
-It extends the trust boundary to native computation and the compiler.
-The new combinatorial and analytic lemmas, and the reused GHR lemma, depend
-only on `propext`, `Classical.choice`, and `Quot.sound`.
+All 17 original native checks now have kernel-checked proofs. Finite
+decisions use `decide +kernel`; the support identities use interval
+arguments, and exact rational identities feed `norm_num`. No native
+computation or compiler trust axiom occurs in the main theorem. The same
+three standard axioms suffice for the combinatorial and analytic lemmas.
+See `evidence/KERNEL_CHECKS.md` for the per-call attempts and timings; the
+native version remains at commit `5bbc2a5eb4d01eb3eb24fb909f819a8d220653f8`.
 See `evidence/AXIOMS.txt`; regenerate it with `AxiomAudit.lean`.
 
 All ten files under `RequestProject/` are copied from Logan Kleinwaks's
